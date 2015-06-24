@@ -61,6 +61,26 @@ var QuantcastMeasurement = {
     },
     
     /**
+       Start a Quantcast Measurement session. Nothing in the Quantcast Measurement API will work until this method is called. Must be called first, preferably right after the 'deviceready' event.
+       This is the network or "P-code" version.
+     @param {callback} hashCallback   A callback function that will return the hashed version of the user identifier passed on to Quantcast. You do not need to take any action with this. It is only returned for your reference. null will be returned if the user has opted out or an error occurs.
+     @param {String} apiKey   Quantcast API key that activity for this app should be reported under. Obtain this key from the Quantcast website.  If you are providing a network code, this can be null.
+     @param {String} networkCode Quantcast network identifier, also known as a P-code.
+     @param {String} userIdentifier    A user identifier string that uniquely identifies the user and is meaningful to the app publisher, usually a user login name. This is not to be confused with a device identifier. There is no requirement on format of this other than that it is a meaningful user identifier to you. Quantcast will immediately one-way hash this value, thus not recording it in its raw form. You should pass nil to indicate that there is no user identifier available, either at the start of the session or at all. @param {String or Array} labels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be ascociated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} appLabels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} networkLabels Labels that are seen by the network instead of the apiKey.
+     @param {Boolean} appIsDirectedAtChildren Whether or not this app is known to be specifically targeted for children 13 and under.  In compliance with COPPA and other international laws, if an app is directly targeted at children 13 and under certain measures must be taken to stop tracking of this audience.
+     */
+    beginNetworkMeasurementSession: function (hashCallback, apiKey, networkCode, userIdentifier, appLabels, networkLabels, appIsDirectedAtChildren ) {
+        var cordovaRef = window.PhoneGap || window.Cordova || window.cordova; // old to new fallbacks
+
+        return cordovaRef.exec( hashCallback, null,
+                               "QuantcastMeasurementPlugin",
+                               "beginNetworkMeasurementSession",
+                               [apiKey, networkCode, userIdentifier, appLabels, networkLabels, appIsDirectedAtChildren]);
+    },
+    
+    /**
      Temporarily suspends the operations of the Quantcast Measurement API. Ideally, this method is called after receiving the 'pause' event.
      @param {String or Array} labels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
      */
@@ -74,6 +94,21 @@ var QuantcastMeasurement = {
     },
     
     /**
+     Temporarily suspends the operations of the Quantcast Measurement API. Ideally, this method is called after receiving the 'pause' event.
+     This is the network or "P-code" version.
+     @param {String or Array} labels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} networkLabels Labels that are seen by the network instead of the apiKey.
+     */
+    pauseNetworkMeasurementSession: function (appLabels, networkLabels) {
+        var cordovaRef = window.PhoneGap || window.Cordova || window.cordova; 
+        
+        return cordovaRef.exec( null, null,
+                               "QuantcastMeasurementPlugin",
+                               "pauseNetworkMeasurementSession",
+                               [appLabels, networkLabels]);
+    },
+    
+    /**
      Resumes the operations of the Quantcast Measurement API after it was suspended. Ideally, this method is called after receiving the 'resume' event.
      @param {String or Array} labels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
      */
@@ -84,6 +119,21 @@ var QuantcastMeasurement = {
                                "QuantcastMeasurementPlugin",
                                "resumeMeasurementSession",
                                [labels]);
+    },
+
+    /**
+     Resumes the operations of the Quantcast Measurement API after it was suspended. Ideally, this method is called after receiving the 'resume' event.
+     This is the network or "P-code" version.
+     @param {String or Array} appLabels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} networkLabels Labels that are seen by the network instead of the apiKey.
+     */
+    resumeNetworkMeasurementSession: function (appLabels, networkLabels) {
+        var cordovaRef = window.PhoneGap || window.Cordova || window.cordova; 
+
+        return cordovaRef.exec( null, null,
+                               "QuantcastMeasurementPlugin",
+                               "resumeNetworkMeasurementSession",
+                               [appLabels, networkLabels]);
     },
     
     /**
@@ -99,6 +149,23 @@ var QuantcastMeasurement = {
                                "recordUserIdentifier",
                                [userIdentifier, labels]);
     },
+
+    /**
+      This feature is only useful if you implement a similar (hashed) user identifier recording with Quantcast Measurement on other platforms, such as the web. This method only needs to be called once per session, preferably immediately after the session has begun, or when the user identifier has changed (e.g., the user logged out and a new user logged in). Quantcast will use a one-way hash to encode the user identifier and record the results of that one-way hash, not what is passed here. The method will return the results of that one-way hash for your reference. You do not need to take any action on the results.
+      This is the network or "P-code" version.
+     @param {callback} hashCallback   A callback function that will return the hashed version of the user identifier passed on to Quantcast. You do not need to take any action with this. It is only returned for your reference. nil will be returned if the user has opted out or an error occurs.
+     @param {String} userIdentifier    A user identifier string that uniquely identifies the user and is meaningful to the app publisher, usually a user login name. This is not to be confused with a device identifier. There is no requirement on format of this other than that it is a meaningful user identifier to you. Quantcast will immediately one-way hash this value, thus not recording it in its raw form. You should pass nil to indicate that there is no user identifier available, either at the start of the session or at all. @param {String or Array} labels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be ascociated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} appLabels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be associated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} networkLabels Labels that are seen by the network instead of the apiKey.
+     */
+    recordNetworkUserIdentifier: function (hashCallback, userIdentifier, appLabels, networkLabels) {
+        var cordovaRef = window.PhoneGap || window.Cordova || window.cordova; 
+        
+        return cordovaRef.exec( hashCallback, null,
+                               "QuantcastMeasurementPlugin",
+                               "recordNetworkUserIdentifier",
+                               [userIdentifier, appLabels, networkLabels]);
+    },
     
     /**
      This is the primarily means for logging events with Quantcast Measurement. What gets logged in this method is completely up to the app developper.
@@ -112,6 +179,22 @@ var QuantcastMeasurement = {
                                "QuantcastMeasurementPlugin",
                                "logEvent",
                                [eventname, labels]);
+    },
+
+    /**
+     This is the primarily means for logging events with Quantcast Measurement. What gets logged in this method is completely up to the app developper.
+      This is the network or "P-code" version.
+     @param {String} eventname A string that identifies the event being logged. Hierarchical information can be indicated by using a left-to-right notation with a period as a seperator. For example, logging one event named "button.left" and another named "button.right" will create three reportable items in Quantcast App Measurement: "button.left", "button.right", and "button". There is no limit on the cardinality that this hierarchal scheme can create, though low-frequency events may not have an audience report on due to the lack of a statistically significant population.
+     @param {String or Array} appLabels   Object containing one or more String objects, each of which are a distinct label to be applied to this event. A label is any arbitrary string that you want to be ascociated with this event, and will create a second dimension in Quantcast Measurement reporting. Nominally, this is a "user class" indicator. For example, you might use one of two labels in your app: one for user who ave not purchased an app upgrade, and one for users who have purchased an upgrade.
+     @param {String or Array} networkLabels Labels that are seen by the network instead of the apiKey.
+     */
+    logNetworkEvent: function (eventname, appLabels, networkLabels) {
+        var cordovaRef = window.PhoneGap || window.Cordova || window.cordova; 
+        
+        return cordovaRef.exec( null, null,
+                               "QuantcastMeasurementPlugin",
+                               "logNetworkEvent",
+                               [eventname, appLabels, networkLabels]);
     },
     
     /**
