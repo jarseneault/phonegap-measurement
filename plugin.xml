@@ -5,7 +5,7 @@
     version="1.1.0">
 
     <name>Quantcast Measurement for Apps</name>
-    
+
     <description>
        Audience measurement and analytics for mobile applications.
     </description>
@@ -13,29 +13,29 @@
     <author>Quantcast</author>
 
     <keywords>measurement,audience,analytics,Quantcast,demographics</keywords>
-   
+
     <license>Quantcast Mobile App Measurement TOS</license>
-    
+
     <engines>
         <engine name="cordova" version=">=2.5.0" />
-    </engines> 
+    </engines>
 
     <js-module src="www/QuantcastMeasurement.js" name="QuantcastMeasurementPlugin">
         <clobbers target="window.QuantcastMeasurement" />
     </js-module>
-    
+
     <config-file target="config.xml" parent="/*">
         <access origin="m.quantcount.com" />
     </config-file>
 
     <platform name="android">
-          <dependency id="com.google.playservices" url="https://github.com/floatinghotpot/google-play-services" commit="r19" />
-        
+        <dependency id="cordova-plugin-googleplayservices" url="https://github.com/floatinghotpot/google-play-services" commit="r19" />
+
         <source-file src="src/android/QuantcastMeasurementPlugin.java" target-dir="src/com/quantcast/phonegapplugin" />
-        
+
         <!-- SDK Code -->
         <source-file src="src/android/sdk/QuantcastAndroidSdk.jar" target-dir="libs" />
-        
+
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="QuantcastMeasurementPlugin">
                 <param name="android-package" value="com.quantcast.phonegapplugin.QuantcastMeasurementPlugin"/>
@@ -60,7 +60,7 @@
     <platform name="ios">
         <source-file src="src/ios/QuantcastMeasurementPlugin.m" compiler-flags="-fno-objc-arc"/>
         <header-file src="src/ios/QuantcastMeasurementPlugin.h" />
-        
+
         <!-- SDK Code -->
         <header-file src="src/ios/sdk/QuantcastNetworkReachability.h" />
         <header-file src="src/ios/sdk/QuantcastParameters.h" />
@@ -92,7 +92,7 @@
                 <param name="ios-package" value="QuantcastMeasurementPlugin" />
             </feature>
         </config-file>
-   
+
         <framework src="libsqlite3.dylib" />
         <framework src="libz.dylib" />
         <framework src="CoreGraphics.framework" />
